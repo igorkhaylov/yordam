@@ -59,6 +59,52 @@ export async function loginRequest({ email, password }) {
   return response.data;
 }
 
+export async function logoutRequest(refreshToken) {
+  const prefix = getApiPrefix();
+
+  const response = await api.post(
+    `${prefix}/users/sessions/logout/`,
+    refreshToken ? { refresh: refreshToken } : {},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.data;
+}
+
+export async function refreshSessionRequest(refreshToken) {
+  const prefix = getApiPrefix();
+
+  const response = await api.post(
+    `${prefix}/users/sessions/refresh/`,
+    {
+      refresh: refreshToken,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.data;
+}
+
+export async function getMeRequest() {
+  const prefix = getApiPrefix();
+
+  const response = await api.get(`${prefix}/users/users/me/`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return response.data;
+}
+
 export async function updateMeRequest({ name, dateOfBirth, gender, picture }) {
   const prefix = getApiPrefix();
 

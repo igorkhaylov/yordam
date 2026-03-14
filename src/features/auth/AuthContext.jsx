@@ -1,16 +1,79 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   startRegisterRequest,
   confirmRegisterRequest,
   loginRequest,
   updateMeRequest,
   googleAuth,
+  logoutRequest,
+  getMeRequest,
 } from "../../shared/api/auth";
+import {
+  AUTH_USER_KEY,
+  AUTH_TOKENS_KEY,
+  clearAuthStorage,
+  saveAuthTokens,
+} from "../../shared/api/http";
 
-const STORAGE_KEY = "psyuz_auth_user";
-const TOKENS_KEY = "psyuz_auth_tokens";
+const STORAGE_KEY = AUTH_USER_KEY;
+const TOKENS_KEY = AUTH_TOKENS_KEY;
 
 const AuthContext = createContext(null);
+
+function parseStorage(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.error("Storage parse error", e);
+    return null;
+  }
+}
+
+function normalizeTokens(data) {
+  const access =
+    data?.access ||
+    data?.access_token ||
+    data?.tokens?.access ||
+    null;
+
+  const refresh =
+    data?.refresh ||
+    data?.refresh_token ||
+    data?.tokens?.refresh ||
+    null;
+
+  return access || refresh ? { access, refresh } : null;
+}
+
+function normalizeUser(data, fallbackEmail = "") {
+  const backendUser =
+    data?.user ||
+    data?.profile ||
+    data?.me ||
+    data;
+
+  return {
+    id: backendUser?.uid || backendUser?.id || fallbackEmail || Date.now(),
+    fullName:
+      backendUser?.name ||
+      backendUser?.full_name ||
+      backendUser?.fullName ||
+      "Пользователь",
+    email:
+      backendUser?.email ||
+      backendUser?.username ||
+      fallbackEmail ||
+      "",
+    username:
+      backendUser?.username ||
+      backendUser?.email ||
+      fallbackEmail ||
+      "",
+    role: backendUser?.role || "client",
+    profile: backendUser || {},
+  };
+}
 
 export function isProfileCompleted(user) {
   const profile = user?.profile || user || {};
@@ -23,25 +86,9 @@ export function isProfileCompleted(user) {
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    try {
-      const rawUser = localStorage.getItem(STORAGE_KEY);
-      return rawUser ? JSON.parse(rawUser) : null;
-    } catch (e) {
-      console.error("Auth parse error", e);
-      return null;
-    }
-  });
-
-  const [tokens, setTokens] = useState(() => {
-    try {
-      const rawTokens = localStorage.getItem(TOKENS_KEY);
-      return rawTokens ? JSON.parse(rawTokens) : null;
-    } catch (e) {
-      console.error("Auth parse error", e);
-      return null;
-    }
-  });
+  const [user, setUser] = useState(() => parseStorage(STORAGE_KEY));
+  const [tokens, setTokens] = useState(() => parseStorage(TOKENS_KEY));
+  const [isBootstrapping, setIsBootstrapping] = useState(true);
 
   const saveAuth = ({ user, tokens }) => {
     setUser(user || null);
@@ -51,12 +98,57 @@ export function AuthProvider({ children }) {
       if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
       else localStorage.removeItem(STORAGE_KEY);
 
-      if (tokens) localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens));
-      else localStorage.removeItem(TOKENS_KEY);
+      if (tokens) {
+        localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens));
+        saveAuthTokens(tokens);
+      } else {
+        localStorage.removeItem(TOKENS_KEY);
+      }
     } catch (e) {
       console.error("Auth save error", e);
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function bootstrapAuth() {
+      if (!tokens?.access) {
+        setIsBootstrapping(false);
+        return;
+      }
+
+      try {
+        const me = await getMeRequest();
+
+        if (cancelled) return;
+
+        const normalizedUser = normalizeUser(me, user?.email || "");
+        saveAuth({
+          user: normalizedUser,
+          tokens,
+        });
+      } catch (error) {
+        console.error("Bootstrap auth failed", error);
+
+        if (!cancelled) {
+          clearAuthStorage();
+          setUser(null);
+          setTokens(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsBootstrapping(false);
+        }
+      }
+    }
+
+    bootstrapAuth();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const login = async ({ email, password }) => {
     if (!email || !password) {
@@ -69,18 +161,12 @@ export function AuthProvider({ children }) {
         password,
       });
 
-      const normalizedUser = {
-        id: data?.uid || data?.id || email,
-        fullName: data?.name || data?.full_name || "Пользователь",
-        email: data?.email || email,
-        username: data?.username || email,
-        role: data?.role || "client",
-        profile: data,
-      };
+      const normalizedTokens = normalizeTokens(data);
+      const normalizedUser = normalizeUser(data, email);
 
       saveAuth({
         user: normalizedUser,
-        tokens: null,
+        tokens: normalizedTokens,
       });
 
       return normalizedUser;
@@ -230,46 +316,12 @@ export function AuthProvider({ children }) {
     try {
       const data = await googleAuth(idToken);
 
-      const access =
-        data?.access ||
-        data?.access_token ||
-        data?.tokens?.access ||
-        null;
-
-      const refresh =
-        data?.refresh ||
-        data?.refresh_token ||
-        data?.tokens?.refresh ||
-        null;
-
-      const backendUser =
-        data?.user ||
-        data?.profile ||
-        data?.me ||
-        null;
-
-      const normalizedUser = backendUser
-        ? {
-            id: backendUser.id,
-            fullName:
-              backendUser.full_name ||
-              backendUser.fullName ||
-              backendUser.name ||
-              "Пользователь",
-            email: backendUser.email || "",
-            role: backendUser.role || "client",
-            profile: backendUser,
-          }
-        : {
-            id: "google-" + Date.now(),
-            fullName: "Пользователь",
-            email: "",
-            role: "client",
-          };
+      const normalizedTokens = normalizeTokens(data);
+      const normalizedUser = normalizeUser(data);
 
       saveAuth({
         user: normalizedUser,
-        tokens: access || refresh ? { access, refresh } : null,
+        tokens: normalizedTokens,
       });
 
       return data;
@@ -287,8 +339,19 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
-    saveAuth({ user: null, tokens: null });
+  const logout = async () => {
+    const refreshToken = tokens?.refresh;
+
+    try {
+      if (refreshToken) {
+        await logoutRequest(refreshToken);
+      }
+    } catch (error) {
+      console.error("LOGOUT ERROR:", error);
+    } finally {
+      clearAuthStorage();
+      saveAuth({ user: null, tokens: null });
+    }
   };
 
   const updateProfile = (profilePatch) => {
@@ -297,6 +360,10 @@ export function AuthProvider({ children }) {
 
       const updated = {
         ...prev,
+        fullName:
+          profilePatch?.name ||
+          profilePatch?.full_name ||
+          prev.fullName,
         profile: {
           ...(prev.profile || {}),
           ...profilePatch,
@@ -318,7 +385,8 @@ export function AuthProvider({ children }) {
       value={{
         user,
         tokens,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user && !!tokens?.access,
+        isBootstrapping,
         login,
         register,
         confirmRegisterCode,
