@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         "/api": {
-          target: env.VITE_API_TARGET || "https://api.yordam.glob.uz",
+          target: env.VITE_API_TARGET || "https://api.365psy.app",
           changeOrigin: true,
           secure: true,
           rewrite: (path) => path.replace(/^\/api/, ""),

@@ -9,7 +9,6 @@ export async function startRegisterRequest({ fullName, email, password }) {
     {
       username: email,
       password,
-      // позже:
       // name: fullName,
     },
     {
