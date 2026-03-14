@@ -1,9 +1,12 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import tailwindcss from "@tailwindcss/vite";
+import path from "path";
+import { fileURLToPath } from "url";
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), "VITE_");
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const env = loadEnv(mode, __dirname, "VITE_");
 
   return {
     plugins: [react(), tailwindcss()],

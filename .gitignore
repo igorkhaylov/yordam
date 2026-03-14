@@ -1,10 +1,6 @@
 # dependencies
 node_modules/
 
-# build
-
-build/
-
 # local env files
 .env
 .env.*
