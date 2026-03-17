@@ -434,13 +434,9 @@ export function PsychologistsListPage() {
             <div className="mb-4 rounded-2xl bg-[#FFECEC] px-4 py-3 text-[13px] text-[#B00020]">
               {error}
             </div>
-<<<<<<< HEAD
           )}
 
           <div className="mt-2 flex flex-col gap-6 lg:mt-0 lg:flex-row">
-=======
-          )} <div className="mt-2 flex flex-col gap-6 lg:mt-0 lg:flex-row">
->>>>>>> 02c988d (login page)
             {/* Фильтры (desktop) */}
             <aside className="hidden w-full shrink-0 lg:block" style={{ width: '260px' }}>
               <div className="rounded-[32px] bg-white p-5 shadow-[0_18px_42px_rgba(0,0,0,0.06)]">
