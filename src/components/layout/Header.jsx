@@ -24,7 +24,6 @@ import { useFavorites } from "../../features/favorites/FavoritesContext";
 import i18n from "../../shared/i18n";
 import { useTranslation } from "react-i18next";
 
-// флажки
 import flagRu from "../../assets/images/ru.png";
 import flagUz from "../../assets/images/uz.png";
 import flagEn from "../../assets/images/en.png";
@@ -35,9 +34,8 @@ function HeaderNavItem({ to, label }) {
       {({ isActive }) => (
         <motion.div
           layout
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className={`relative inline-flex items-center px-3 py-1 text-[13px] font-medium transition-colors group
-          ${
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className={`relative inline-flex items-center px-2.5 py-1 text-[13px] font-medium transition-colors group ${
             isActive
               ? "text-[#071A34]"
               : "text-[#6D7685] hover:text-[#071A34]"
@@ -46,11 +44,8 @@ function HeaderNavItem({ to, label }) {
           <span>{label}</span>
           <span
             className={`pointer-events-none absolute -bottom-1 left-0 h-[2px] w-full rounded-full bg-[#1F98FA]
-            origin-left transition-transform duration-500 ease-in-out
-            ${
-              isActive
-                ? "scale-x-100"
-                : "scale-x-0 group-hover:scale-x-100"
+            origin-left transition-transform duration-300 ease-in-out ${
+              isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
             }`}
           />
         </motion.div>
@@ -179,18 +174,23 @@ export function Header() {
 
   return (
     <header className="bg-white">
-      <div className="mx-auto flex max-w-[1920px] flex-col px-4 py-3 lg:px-[72px] lg:py-[22px]">
-        <div className="flex w-full items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
+      <div className="mx-auto flex max-w-[1920px] flex-col px-4 py-3 md:px-6 xl:px-8 2xl:px-[72px] xl:py-[18px] 2xl:py-[22px]">
+        <div className="flex w-full items-center justify-between gap-4">
+          <Link to="/" className="shrink-0">
             <img
               src={logo}
               alt="Yordam"
-              className="h-[32px] w-auto object-contain"
+              className="h-[30px] w-auto object-contain xl:h-[32px]"
             />
           </Link>
 
-          <nav className="ml-6 flex flex-1 items-center justify-end gap-6">
-            <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }} className="hidden items-center gap-6 text-[13px] text-[#6D7685] lg:flex">
+          <nav className="ml-auto flex items-center gap-3 xl:gap-5">
+            {/* Desktop only from 1280px and up */}
+            <motion.div
+              layout
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="hidden xl:flex items-center gap-4 2xl:gap-6 text-[13px] text-[#6D7685]"
+            >
               {navLinks.map((link) => (
                 <HeaderNavItem
                   key={link.to}
@@ -199,7 +199,7 @@ export function Header() {
                 />
               ))}
 
-              <div ref={langDropdownRef} className="relative">
+              <div ref={langDropdownRef} className="relative shrink-0">
                 <button
                   type="button"
                   onClick={() => setLangMenuOpen((v) => !v)}
@@ -250,7 +250,7 @@ export function Header() {
               {user && (
                 <Link
                   to="/favorites"
-                  className="relative flex h-9 w-9 items-center justify-center rounded-full text-[#1F98FA] hover:bg-[#E8F4FF]"
+                  className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#1F98FA] hover:bg-[#E8F4FF]"
                   title={t("header.favorites.title")}
                 >
                   <Heart
@@ -265,25 +265,27 @@ export function Header() {
               )}
             </motion.div>
 
-            <div className="hidden items-center lg:flex">
+            {/* Desktop auth/profile only from 1280px and up */}
+            <div className="hidden xl:flex items-center">
               {!user ? (
-                <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }} className="ml-auto flex items-center gap-3 text-[13px]">
-                  <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }}>
-                    <Link
-                      to="/auth/login"
-                      className="inline-flex items-center justify-center rounded-full border border-[#C7D2E2] px-4 py-2 text-[#071A34] hover:border-[#1F98FA]"
-                    >
-                      {t("header.auth.login")}
-                    </Link>
-                  </motion.div>
-                  <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }}>
-                    <Link
-                      to="/auth/register"
-                      className="inline-flex items-center justify-center rounded-full border border-[#1F98FA] bg-[#1F98FA] px-5 py-2 text-[13px] font-semibold text-white shadow-[0_10px_24px_rgba(31,152,250,0.55)] hover:bg-[#0f84e2]"
-                    >
-                      {t("header.auth.register")}
-                    </Link>
-                  </motion.div>
+                <motion.div
+                  layout
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="ml-auto flex items-center gap-3 text-[13px]"
+                >
+                  <Link
+                    to="/auth/login"
+                    className="inline-flex items-center justify-center rounded-full border border-[#C7D2E2] px-4 py-2 text-[#071A34] hover:border-[#1F98FA]"
+                  >
+                    {t("header.auth.login")}
+                  </Link>
+
+                  <Link
+                    to="/auth/register"
+                    className="inline-flex items-center justify-center rounded-full border border-[#1F98FA] bg-[#1F98FA] px-5 py-2 text-[13px] font-semibold text-white shadow-[0_10px_24px_rgba(31,152,250,0.55)] hover:bg-[#0f84e2]"
+                  >
+                    {t("header.auth.register")}
+                  </Link>
                 </motion.div>
               ) : (
                 <div
@@ -299,16 +301,16 @@ export function Header() {
                       <img
                         src={avatarUrl}
                         alt={displayName}
-                        className="h-9 w-9 rounded-full object-cover"
+                        className="h-9 w-9 shrink-0 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1F98FA] text-[14px] font-semibold text-white">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1F98FA] text-[14px] font-semibold text-white">
                         {initials}
                       </div>
                     )}
 
-                    <div className="hidden flex-col items-start leading-tight sm:flex">
-                      <span className="text-[13px] font-semibold text-[#071A34]">
+                    <div className="flex min-w-0 max-w-[140px] flex-col items-start leading-tight 2xl:max-w-[170px]">
+                      <span className="truncate text-[13px] font-semibold text-[#071A34]">
                         {displayName}
                       </span>
                       <span className="text-[11px] text-[#9BA6B5]">
@@ -319,9 +321,9 @@ export function Header() {
                     </div>
 
                     {menuOpen ? (
-                      <ChevronUp className="h-4 w-4 text-[#9BA6B5]" />
+                      <ChevronUp className="h-4 w-4 shrink-0 text-[#9BA6B5]" />
                     ) : (
-                      <ChevronDown className="h-4 w-4 text-[#9BA6B5]" />
+                      <ChevronDown className="h-4 w-4 shrink-0 text-[#9BA6B5]" />
                     )}
                   </button>
 
@@ -406,9 +408,10 @@ export function Header() {
               )}
             </div>
 
+            {/* Burger from <1280 */}
             <button
               type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#D0D9E5] bg-white text-[#071A34] hover:border-[#1F98FA] lg:hidden"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#D0D9E5] bg-white text-[#071A34] hover:border-[#1F98FA] xl:hidden"
               onClick={() => setMobileOpen((v) => !v)}
             >
               <div className="flex flex-col items-center justify-center">
@@ -432,6 +435,7 @@ export function Header() {
           </nav>
         </div>
 
+        {/* Mobile / tablet menu for <1280 */}
         <AnimatePresence initial={false}>
           {mobileOpen && (
             <motion.div
@@ -440,7 +444,7 @@ export function Header() {
               animate={{ opacity: 1, height: "auto", y: 0 }}
               exit={{ opacity: 0, height: 0, y: -8 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="mt-3 w-full overflow-hidden rounded-2xl border border-[#E1E8F0] bg-white p-3 text-[14px] text-[#071A34] shadow-[0_18px_42px_rgba(67,142,229,0.15)] lg:hidden"
+              className="mt-3 w-full overflow-hidden rounded-2xl border border-[#E1E8F0] bg-white p-3 text-[14px] text-[#071A34] shadow-[0_18px_42px_rgba(67,142,229,0.15)] xl:hidden"
             >
               <div className="flex flex-col gap-2">
                 {navLinks.map((link) => (
@@ -499,8 +503,8 @@ export function Header() {
                           </div>
                         )}
 
-                        <div className="flex flex-col leading-tight">
-                          <span className="font-semibold text-[#071A34]">
+                        <div className="flex min-w-0 flex-col leading-tight">
+                          <span className="truncate font-semibold text-[#071A34]">
                             {displayName}
                           </span>
                           <span className="text-[11px] text-[#9BA6B5]">
@@ -545,6 +549,7 @@ export function Header() {
                       >
                         {t("header.auth.login")}
                       </Link>
+
                       <Link
                         to="/auth/register"
                         className="rounded-full border border-[#1F98FA] bg-[#1F98FA] px-4 py-2 text-center text-[13px] font-semibold text-white shadow-[0_10px_24px_rgba(31,152,250,0.55)] hover:bg-[#0f84e2]"

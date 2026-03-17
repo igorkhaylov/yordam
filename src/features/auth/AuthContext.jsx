@@ -8,6 +8,7 @@ import {
   logoutRequest,
   getMeRequest,
   changePasswordRequest,
+  refreshSessionRequest,
 } from "../../shared/api/auth";
 import {
   AUTH_USER_KEY,
@@ -20,6 +21,10 @@ const STORAGE_KEY = AUTH_USER_KEY;
 const TOKENS_KEY = AUTH_TOKENS_KEY;
 
 const AuthContext = createContext(null);
+
+/* =========================
+   Helpers
+========================= */
 
 function parseStorage(key) {
   try {
@@ -76,15 +81,47 @@ function normalizeUser(data, fallbackEmail = "") {
   };
 }
 
+function decodeJwtPayload(token) {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const normalized = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+
+    const json = atob(normalized);
+    return JSON.parse(json);
+  } catch (error) {
+    console.error("JWT decode error:", error);
+    return null;
+  }
+}
+
+function isTokenExpiredOrClose(token, bufferSeconds = 30) {
+  if (!token) return true;
+
+  const payload = decodeJwtPayload(token);
+  const exp = payload?.exp;
+
+  if (!exp) return true;
+
+  const now = Math.floor(Date.now() / 1000);
+  return exp <= now + bufferSeconds;
+}
+
 export function isProfileCompleted(user) {
   const profile = user?.profile || user || {};
 
   return Boolean(
     (profile.name || user?.fullName) &&
-    profile.date_of_birth &&
-    profile.gender
+      profile.date_of_birth &&
+      profile.gender
   );
 }
+
+/* =========================
+   Provider
+========================= */
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => parseStorage(STORAGE_KEY));
@@ -96,8 +133,11 @@ export function AuthProvider({ children }) {
     setTokens(tokens || null);
 
     try {
-      if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-      else localStorage.removeItem(STORAGE_KEY);
+      if (user) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
 
       if (tokens) {
         localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens));
@@ -110,24 +150,61 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const refreshAccessTokenIfNeeded = async (currentTokens) => {
+    if (!currentTokens?.refresh) {
+      throw new Error("Нет refresh token");
+    }
+
+    if (!isTokenExpiredOrClose(currentTokens?.access)) {
+      return currentTokens;
+    }
+
+    const refreshed = await refreshSessionRequest(currentTokens.refresh);
+
+    const nextTokens = {
+      access:
+        refreshed?.access ||
+        refreshed?.access_token ||
+        refreshed?.tokens?.access ||
+        currentTokens.access,
+      refresh:
+        refreshed?.refresh ||
+        refreshed?.refresh_token ||
+        refreshed?.tokens?.refresh ||
+        currentTokens.refresh,
+    };
+
+    saveAuth({
+      user,
+      tokens: nextTokens,
+    });
+
+    return nextTokens;
+  };
+
   useEffect(() => {
     let cancelled = false;
 
     async function bootstrapAuth() {
-      if (!tokens?.access) {
+      if (!tokens?.access && !tokens?.refresh) {
         setIsBootstrapping(false);
         return;
       }
 
       try {
+        const actualTokens = await refreshAccessTokenIfNeeded(tokens);
+
+        if (cancelled) return;
+
         const me = await getMeRequest();
 
         if (cancelled) return;
 
         const normalizedUser = normalizeUser(me, user?.email || "");
+
         saveAuth({
           user: normalizedUser,
-          tokens,
+          tokens: actualTokens,
         });
       } catch (error) {
         console.error("Bootstrap auth failed", error);
@@ -168,13 +245,11 @@ export function AuthProvider({ children }) {
         throw new Error("Сервер не вернул access token");
       }
 
-      // Сначала сохраняем токены, чтобы следующий запрос /me/ пошел с Authorization
       saveAuth({
         user: null,
         tokens: normalizedTokens,
       });
 
-      // Сразу тянем настоящий профиль с бэка
       const me = await getMeRequest();
       const normalizedUser = normalizeUser(me, email);
 
@@ -274,13 +349,18 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const saveProfileSettings = async ({ name, dateOfBirth, gender, picture }) => {
+  const saveProfileSettings = async ({
+    name,
+    dateOfBirth,
+    gender,
+    pictureFile,
+  }) => {
     try {
       const data = await updateMeRequest({
         name,
         dateOfBirth,
         gender,
-        picture,
+        pictureFile,
       });
 
       const updatedUser = {
@@ -299,8 +379,7 @@ export function AuthProvider({ children }) {
       saveAuth({
         user: updatedUser,
         tokens,
-      }
-    );
+      });
 
       return updatedUser;
     } catch (error) {
@@ -314,6 +393,7 @@ export function AuthProvider({ children }) {
         responseData?.detail ||
         responseData?.message ||
         responseData?.error ||
+        responseData?.picture?.[0] ||
         responseData?.non_field_errors?.[0] ||
         responseData?.name?.[0] ||
         responseData?.date_of_birth?.[0] ||
@@ -360,14 +440,25 @@ export function AuthProvider({ children }) {
       const data = await googleAuth(idToken);
 
       const normalizedTokens = normalizeTokens(data);
-      const normalizedUser = normalizeUser(data);
+
+      if (!normalizedTokens?.access) {
+        throw new Error("Сервер не вернул access token");
+      }
+
+      saveAuth({
+        user: null,
+        tokens: normalizedTokens,
+      });
+
+      const me = await getMeRequest();
+      const normalizedUser = normalizeUser(me);
 
       saveAuth({
         user: normalizedUser,
         tokens: normalizedTokens,
       });
 
-      return data;
+      return normalizedUser;
     } catch (error) {
       const responseData = error?.response?.data;
 
@@ -449,4 +540,4 @@ export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
   return ctx;
-}
+} 

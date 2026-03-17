@@ -878,7 +878,7 @@ const resources = {
                 notifications: {
                     sectionTitle: "Уведомления",
                     emailLabel: "Получать письма о новых сессиях и напоминаниях",
-                    pushLabel: "Пуш-уведомления о предстоящих встречах"
+                    pushLabel: "Получать уведомления о новостях сервиса по имейлу"
                 },
 
                 saveProfileButton: "Сохранить изменения",
@@ -1804,65 +1804,65 @@ const resources = {
                     next: "Keyingi",
                 },
             },
-           clientSettingsPage: {
-  title: "Hisob sozlamalari",
-  subtitle: "Bu yerda siz profil rasmi, ism va bildirishnomalarni yangilashingiz mumkin.",
+            clientSettingsPage: {
+                title: "Hisob sozlamalari",
+                subtitle: "Bu yerda siz profil rasmi, ism va bildirishnomalarni yangilashingiz mumkin.",
 
-  avatar: {
-    noPhoto: "Rasm yo‘q",
-    changePhoto: "Rasmni o‘zgartirish",
-    hint: "JPG, PNG 5 MB gacha. Rasm doira shaklida kesiladi.",
-    uploadHint:
-      "picture formati backendda aniqlangandan keyin rasm yuklash yoqiladi.",
-    errorType: "Faqat JPG va PNG qo‘llab-quvvatlanadi.",
-    errorSize: "Fayl hajmi {{max}} MB dan oshmasligi kerak."
+                avatar: {
+                    noPhoto: "Rasm yo‘q",
+                    changePhoto: "Rasmni o‘zgartirish",
+                    hint: "JPG, PNG 5 MB gacha. Rasm doira shaklida kesiladi.",
+                    uploadHint:
+                        "picture formati backendda aniqlangandan keyin rasm yuklash yoqiladi.",
+                    errorType: "Faqat JPG va PNG qo‘llab-quvvatlanadi.",
+                    errorSize: "Fayl hajmi {{max}} MB dan oshmasligi kerak."
+                },
+
+                profile: {
+                    sectionTitle: "Shaxsiy ma’lumotlar",
+                    fullNameLabel: "Ism va familiya",
+                    emailLabel: "Email",
+                    emailHint:
+                        "Email kirish va bildirishnomalar uchun ishlatiladi. Emailni almashtirish keyinroq qo‘shiladi.",
+                    birthDateLabel: "Tug‘ilgan sana",
+                    genderLabel: "Jins",
+                    genderPlaceholder: "Jinsni tanlang",
+                    genderMale: "Erkak",
+                    genderFemale: "Ayol"
+                },
+
+                notifications: {
+                    sectionTitle: "Bildirishnomalar",
+                    emailLabel: "Yangi sessiyalar va eslatmalar haqida email olish",
+                    pushLabel: "Xizmat yangiliklarini elektron pochta orqali oling"
   },
 
-  profile: {
-    sectionTitle: "Shaxsiy ma’lumotlar",
-    fullNameLabel: "Ism va familiya",
-    emailLabel: "Email",
-    emailHint:
-      "Email kirish va bildirishnomalar uchun ishlatiladi. Emailni almashtirish keyinroq qo‘shiladi.",
-    birthDateLabel: "Tug‘ilgan sana",
-    genderLabel: "Jins",
-    genderPlaceholder: "Jinsni tanlang",
-    genderMale: "Erkak",
-    genderFemale: "Ayol"
-  },
+                saveProfileButton: "O‘zgarishlarni saqlash",
+                saveProfileLoading: "Saqlanmoqda...",
+                saveProfileSuccess: "O‘zgarishlar saqlandi",
+                saveProfileError: "O‘zgarishlarni saqlab bo‘lmadi",
 
-  notifications: {
-    sectionTitle: "Bildirishnomalar",
-    emailLabel: "Yangi sessiyalar va eslatmalar haqida email olish",
-    pushLabel: "Yaqinlashayotgan uchrashuvlar haqida push-bildirishnomalar"
-  },
+                password: {
+                    sectionTitle: "Parolni o‘zgartirish",
+                    description:
+                        "Joriy parolingizni kiriting va yangisini o‘ylab toping. Saqlangandan keyin yangi parol bilan kirishingiz kerak bo‘ladi.",
 
-  saveProfileButton: "O‘zgarishlarni saqlash",
-  saveProfileLoading: "Saqlanmoqda...",
-  saveProfileSuccess: "O‘zgarishlar saqlandi",
-  saveProfileError: "O‘zgarishlarni saqlab bo‘lmadi",
+                    currentLabel: "Joriy parol",
+                    newLabel: "Yangi parol",
+                    confirmLabel: "Yangi parolni takrorlang",
 
-  password: {
-    sectionTitle: "Parolni o‘zgartirish",
-    description:
-      "Joriy parolingizni kiriting va yangisini o‘ylab toping. Saqlangandan keyin yangi parol bilan kirishingiz kerak bo‘ladi.",
+                    errors: {
+                        fillAll: "Parolni o‘zgartirish uchun barcha maydonlarni to‘ldiring.",
+                        tooShort: "Yangi parol kamida 8 ta belgidan iborat bo‘lishi kerak.",
+                        mismatch: "Parollar mos kelmaydi."
+                    },
 
-    currentLabel: "Joriy parol",
-    newLabel: "Yangi parol",
-    confirmLabel: "Yangi parolni takrorlang",
+                    success:
+                        "Parol yangilandi (hozircha faqat frontendda). Haqiqiy o‘zgartirish uchun backendni ulang.",
 
-    errors: {
-      fillAll: "Parolni o‘zgartirish uchun barcha maydonlarni to‘ldiring.",
-      tooShort: "Yangi parol kamida 8 ta belgidan iborat bo‘lishi kerak.",
-      mismatch: "Parollar mos kelmaydi."
-    },
-
-    success:
-      "Parol yangilandi (hozircha faqat frontendda). Haqiqiy o‘zgartirish uchun backendni ulang.",
-
-    submitButton: "Parolni yangilash"
-  }
-},
+                    submitButton: "Parolni yangilash"
+                }
+            },
             faqSection: {
                 heading: {
                     blue: "Ko‘p beriladigan",
@@ -2801,7 +2801,7 @@ const resources = {
                 notifications: {
                     sectionTitle: "Notifications",
                     emailLabel: "Receive emails about new sessions and reminders",
-                    pushLabel: "Push notifications about upcoming meetings"
+                    pushLabel: "Receive service news notifications by email"
                 },
 
                 saveProfileButton: "Save changes",
