@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, SearchX } from "lucide-react";
 
 import { PsychologistCard } from "../components/PsychologistCard.jsx";
 import { MainLayout } from "../../../components/layout/MainLayout.jsx";
 import { getPsychologistsList } from "../../../shared/api/api";
 import { useTranslation } from "react-i18next";
+import { EmptyState } from "../../../shared/ui/EmptyState";
 
 const ANY_VALUE = "__any";
 
@@ -52,7 +53,7 @@ function PsychologistCardSkeleton() {
 const ANY = "__any";
 
 export function PsychologistsListPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [allPsychologists, setAllPsychologists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -98,8 +99,7 @@ export function PsychologistsListPage() {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [i18n.language, t]);
 
   // ===== 2. Сортировка =====
   const sortOptions = [
@@ -460,9 +460,13 @@ export function PsychologistsListPage() {
               )}
 
               {!loading && !visibleList.length && (
-                <p className="text-[14px] text-[#6F7A89]">
-                  {t("psychologistsList.messages.empty")}
-                </p>
+                <EmptyState
+                  icon={SearchX}
+                  title={t("psychologistsList.messages.empty")}
+                  description={t("psychologistsList.messages.emptyHint", "Попробуйте изменить параметры поиска или сбросить фильтры")}
+                  actionLabel={t("psychologistsList.filters.reset")}
+                  onAction={handleResetFilters}
+                />
               )}
 
               {!loading && !!visibleList.length && (

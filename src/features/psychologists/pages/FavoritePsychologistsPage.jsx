@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Heart } from "lucide-react";
 
 import { MainLayout } from "../../../components/layout/MainLayout.jsx";
 import { useFavorites } from "../../favorites/FavoritesContext.jsx";
 import { PsychologistCard } from "../components/PsychologistCard.jsx";
 import { getPsychologistsList } from "../../../shared/api/api";
 import { useTranslation } from "react-i18next";
+import { EmptyState } from "../../../shared/ui/EmptyState";
 
 export default function FavoritePsychologistsPage() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { favoriteIds } = useFavorites();
+    const navigate = useNavigate();
 
     const [allPsychologists, setAllPsychologists] = useState([]);
     const [loading, setLoading] = useState(favoriteIds.length > 0);
@@ -52,7 +55,7 @@ export default function FavoritePsychologistsPage() {
         return () => {
             cancelled = true;
         };
-    }, [favoriteIds, t]);
+    }, [favoriteIds, t, i18n.language]);
 
     const favorites = useMemo(
         () =>
@@ -100,8 +103,14 @@ export default function FavoritePsychologistsPage() {
 
                 {/* ЕЩЁ НЕТ ИЗБРАННЫХ */}
                 {!loading && !error && favoriteIds.length === 0 && (
-                    <div className="rounded-[24px] bg-white/90 p-8 text-[14px] text-[#6F7A89] shadow-sm">
-                        {t("favoritesPage.empty.noFavorites")}
+                    <div className="rounded-[24px] bg-white/90 shadow-sm">
+                        <EmptyState
+                            icon={Heart}
+                            title={t("favoritesPage.empty.noFavorites")}
+                            description={t("favoritesPage.empty.noFavoritesHint", "Нажмите на сердечко на карточке специалиста, чтобы добавить в избранное")}
+                            actionLabel={t("favoritesPage.empty.goToCatalog", "Перейти в каталог")}
+                            onAction={() => navigate("/psychologists")}
+                        />
                     </div>
                 )}
 

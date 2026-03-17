@@ -16,7 +16,7 @@ const mockReviews = [
 ];
 
 export function PsychologistDetailPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const { favoriteIds, toggleFavorite } = useFavorites();
   const reviewsRef = useRef(null);
@@ -56,7 +56,7 @@ export function PsychologistDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, i18n.language]);
 
   if (loading) {
     return (
