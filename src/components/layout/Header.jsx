@@ -31,7 +31,9 @@ function HeaderNavItem({ to, label }) {
   return (
     <NavLink to={to} end={to === "/"}>
       {({ isActive }) => (
-        <div
+        <motion.div
+          layout
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           className={`relative inline-flex items-center px-3 py-1 text-[13px] font-medium transition-colors group
           ${
             isActive
@@ -51,7 +53,7 @@ function HeaderNavItem({ to, label }) {
               }
             `}
           />
-        </div>
+        </motion.div>
       )}
     </NavLink>
   );
@@ -186,7 +188,7 @@ export function Header() {
           </Link>
 
           <nav className="ml-6 flex flex-1 items-center justify-end gap-6">
-            <div className="hidden items-center gap-6 text-[13px] text-[#6D7685] lg:flex">
+            <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }} className="hidden items-center gap-6 text-[13px] text-[#6D7685] lg:flex">
               {navLinks.map((link) => (
                 <HeaderNavItem
                   key={link.to}
@@ -258,24 +260,28 @@ export function Header() {
                   )}
                 </Link>
               )}
-            </div>
+            </motion.div>
 
             <div className="hidden items-center lg:flex">
               {!user ? (
-                <div className="ml-auto flex items-center gap-3 text-[13px]">
-                  <Link
-                    to="/auth/login"
-                    className="inline-flex items-center justify-center rounded-full border border-[#C7D2E2] px-4 py-2 text-[#071A34] hover:border-[#1F98FA]"
-                  >
-                    {t("header.auth.login")}
-                  </Link>
-                  <Link
-                    to="/auth/register"
-                    className="inline-flex items-center justify-center rounded-full border border-[#1F98FA] bg-[#1F98FA] px-5 py-2 text-[13px] font-semibold text-white shadow-[0_10px_24px_rgba(31,152,250,0.55)] hover:bg-[#0f84e2]"
-                  >
-                    {t("header.auth.register")}
-                  </Link>
-                </div>
+                <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }} className="ml-auto flex items-center gap-3 text-[13px]">
+                  <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }}>
+                    <Link
+                      to="/auth/login"
+                      className="inline-flex items-center justify-center rounded-full border border-[#C7D2E2] px-4 py-2 text-[#071A34] hover:border-[#1F98FA]"
+                    >
+                      {t("header.auth.login")}
+                    </Link>
+                  </motion.div>
+                  <motion.div layout transition={{ duration: 0.3, ease: "easeInOut" }}>
+                    <Link
+                      to="/auth/register"
+                      className="inline-flex items-center justify-center rounded-full border border-[#1F98FA] bg-[#1F98FA] px-5 py-2 text-[13px] font-semibold text-white shadow-[0_10px_24px_rgba(31,152,250,0.55)] hover:bg-[#0f84e2]"
+                    >
+                      {t("header.auth.register")}
+                    </Link>
+                  </motion.div>
+                </motion.div>
               ) : (
                 <div
                   ref={accountDropdownRef}

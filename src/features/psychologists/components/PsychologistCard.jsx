@@ -49,7 +49,7 @@ export function PsychologistCard({ psychologist }) {
   ].filter(Boolean).slice(0, 5);
 
   return (
-    <article className="w-full rounded-[24px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(67,142,229,0.16)]">
+    <article className="w-full min-w-0 overflow-hidden rounded-[24px] bg-white px-5 py-5 shadow-[0_18px_42px_rgba(67,142,229,0.16)]">
       {/* Верх: аватар, имя, опыт, избранное */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
@@ -71,7 +71,7 @@ export function PsychologistCard({ psychologist }) {
             )}
           </Link>
 
-          <div className="flex flex-col gap-0.5">
+          <div className="flex min-w-0 flex-col gap-0.5">
             {/* Проверен Yordam */}
             <div className="flex items-center gap-1 text-[11px] text-[#6F7A89]">
               {verified && (
@@ -85,7 +85,7 @@ export function PsychologistCard({ psychologist }) {
             {/* Имя */}
             <Link
               to={`/psychologists/${id}`}
-              className="text-[15px] font-semibold text-[#071A34] hover:text-[#1F98FA] transition-colors"
+              className="block truncate text-[15px] font-semibold text-[#071A34] hover:text-[#1F98FA] transition-colors"
             >
               {name}
             </Link>
@@ -142,13 +142,13 @@ export function PsychologistCard({ psychologist }) {
       <div className="mt-5 flex items-center justify-between">
         <Link
           to={`/psychologists/${id}`}
-          className="inline-flex items-center justify-center rounded-full bg-[#1F98FA] px-6 py-2.5 text-[13px] font-semibold text-white shadow-[0_12px_24px_rgba(31,152,250,0.45)] hover:bg-[#0f84e2] transition-colors"
+          className="inline-flex items-center justify-center rounded-full bg-[#1F98FA] px-4 py-2 text-[13px] font-semibold text-white shadow-[0_12px_24px_rgba(31,152,250,0.45)] hover:bg-[#0f84e2] transition-colors whitespace-nowrap"
         >
           Подробнее
         </Link>
 
-        <div className="text-right leading-tight">
-          <div className="text-[16px] font-semibold text-[#1F98FA]">
+        <div className="text-right leading-tight whitespace-nowrap">
+          <div className="text-[14px] font-semibold text-[#1F98FA]">
             {priceNumber ?? "Цена уточняется"}
           </div>
           {priceNumber && (

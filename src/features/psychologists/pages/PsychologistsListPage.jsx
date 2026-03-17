@@ -365,7 +365,7 @@ export function PsychologistsListPage() {
             </div>
 
             {/* Найдено + сортировка / мобильные фильтры */}
-            <div className="mt-4 hidden items-center justify-between md:flex">
+            <div className="mt-4 hidden items-center justify-between lg:flex">
               <p className="text-[13px] text-[#6F7A89]">
                 {t("psychologistsList.found.prefix")} {totalFound}{" "}
                 {t("psychologistsList.found.suffix")}
@@ -414,7 +414,7 @@ export function PsychologistsListPage() {
             </div>
 
             {/* мобилка: найдено + кнопка фильтров */}
-            <div className="mt-4 flex items-center justify-between md:hidden">
+            <div className="mt-4 flex items-center justify-between lg:hidden">
               <p className="text-[12px] text-[#6F7A89]">
                 {t("psychologistsList.found.prefix")} {totalFound}{" "}
                 {t("psychologistsList.found.suffix")}
@@ -441,18 +441,18 @@ export function PsychologistsListPage() {
             </div>
           )}
 
-          <div className="mt-2 flex flex-col gap-6 md:mt-0 md:flex-row">
+          <div className="mt-2 flex flex-col gap-6 lg:mt-0 lg:flex-row">
             {/* Фильтры (desktop) */}
-            <aside className="hidden w-full shrink-0 md:block" style={{ width: '260px' }}>
+            <aside className="hidden w-full shrink-0 lg:block" style={{ width: '260px' }}>
               <div className="rounded-[32px] bg-white p-5 shadow-[0_18px_42px_rgba(0,0,0,0.06)]">
                 {renderFiltersContent()}
               </div>
             </aside>
 
             {/* Список */}
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               {loading && !allPsychologists.length && (
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
                   {Array.from({ length: 8 }).map((_, i) => (
                     <PsychologistCardSkeleton key={i} />
                   ))}
@@ -467,7 +467,7 @@ export function PsychologistsListPage() {
 
               {!loading && !!visibleList.length && (
                 <>
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
                     {visibleList.map((psy) => (
                       <PsychologistCard key={psy.id} psychologist={psy} />
                     ))}
@@ -495,7 +495,7 @@ export function PsychologistsListPage() {
 
       {/* ===== МОДАЛКА ФИЛЬТРОВ (мобилка) ===== */}
       {filtersModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end md:hidden">
+        <div className="fixed inset-0 z-50 flex items-end lg:hidden">
           <button
             type="button"
             className="absolute inset-0 bg-[rgba(15,23,42,0.45)]"
